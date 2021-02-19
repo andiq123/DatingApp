@@ -6,11 +6,13 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
+
     public class AccountController : BaseController
     {
         private readonly DataContext _context;
@@ -41,6 +43,7 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
+            loginDto.Username = loginDto.Username.ToLower();
             var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == loginDto.Username);
             if (user == null) return Unauthorized("Invalid Username!");
             using var hmac = new HMACSHA512(user.PasswordSalt);
